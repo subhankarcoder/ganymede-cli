@@ -40,6 +40,7 @@ func PrintFullHelp(theme string) {
 	printCmd("status", "Show active color mode, hotkey status, and startup configuration")
 	printCmd("config [subcommand]", "Interactively modify preferences or pass specific settings")
 	printCmd("help, --help", "Display this comprehensive user guide and command manual")
+	printCmd("version, --version", "Display current release version of Ganymede CLI")
 	printCmd("demo", "Preview all available color themes (Ganymede, Rainbow, etc.)")
 	fmt.Println()
 

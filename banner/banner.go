@@ -182,15 +182,22 @@ func GetTheme(name string) []Color {
 	}
 }
 
+// Version represents the current release version of Ganymede CLI.
+// Can be overridden at build time via -ldflags "-X ganymede-cli/banner.Version=x.y.z"
+var Version = "0.1.0"
+
 // PrintBanner prints the Ganymede CLI header
 func PrintBanner(themeName string, animated bool) {
 	palette := GetTheme(themeName)
 
 	fmt.Println()
-	// Badge and header box without "Terminal Color Studio & Palette Engine"
-	badge := fmt.Sprintf(" %s%s✦ GANYMEDE ✦%s  %sv0.1.0%s",
+	vStr := Version
+	if !strings.HasPrefix(vStr, "v") {
+		vStr = "v" + vStr
+	}
+	badge := fmt.Sprintf(" %s%s✦ GANYMEDE ✦%s  %s%s%s",
 		Bold(), Color{R: 251, G: 191, B: 36}.RGB(), Reset(),
-		Dim(), Reset(),
+		Dim(), vStr, Reset(),
 	)
 
 	divider := fmt.Sprintf("%s%s%s", Dim(), strings.Repeat("─", 74), Reset())

@@ -1,0 +1,29 @@
+# Compiled binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.bin
+
+# Archives & build packages
+*.zip
+*.tar.gz
+*.7z
+dist/
+build/
+bin/
+
+# Temporary and test files
+*.tmp
+*.log
+scratch/
+
+# IDE & Editor configuration
+.idea/
+.vscode/
+*.swp
+*~
+
+# Go workspace / vendor
+vendor/

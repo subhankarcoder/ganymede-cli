@@ -1,0 +1,132 @@
+name: Release & WinGet CD
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Publish Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Determine Version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $rawTag = "${{ github.event.inputs.tag_name }}"
+          } else {
+            $rawTag = "${{ github.ref_name }}"
+          }
+          $cleanVersion = $rawTag.TrimStart('v')
+          Write-Host "Tag: $rawTag"
+          Write-Host "Version: $cleanVersion"
+          echo "tag=$rawTag" >> $env:GITHUB_OUTPUT
+          echo "version=$cleanVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Build Windows AMD64 Executable
+        shell: pwsh
+        env:
+          GOOS: windows
+          GOARCH: amd64
+        run: |
+          New-Item -ItemType Directory -Force -Path "dist/amd64" | Out-Null
+          go build -trimpath -ldflags="-H=windowsgui -s -w -X 'ganymede-cli/banner.Version=${{ steps.version.outputs.tag }}'" -o dist/amd64/ganymede.exe .
+
+      - name: Build Windows ARM64 Executable
+        shell: pwsh
+        env:
+          GOOS: windows
+          GOARCH: arm64
+        run: |
+          New-Item -ItemType Directory -Force -Path "dist/arm64" | Out-Null
+          go build -trimpath -ldflags="-H=windowsgui -s -w -X 'ganymede-cli/banner.Version=${{ steps.version.outputs.tag }}'" -o dist/arm64/ganymede.exe .
+
+      - name: Package Release Archives
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "artifacts" | Out-Null
+
+          # Package AMD64
+          Copy-Item -Path "dist/amd64/ganymede.exe" -Destination "." -Force
+          Compress-Archive -Path "ganymede.exe", "README.md", "LICENSE" -DestinationPath "artifacts/ganymede-windows-amd64.zip" -Force
+          Remove-Item "ganymede.exe" -Force
+
+          # Package ARM64
+          Copy-Item -Path "dist/arm64/ganymede.exe" -Destination "." -Force
+          Compress-Archive -Path "ganymede.exe", "README.md", "LICENSE" -DestinationPath "artifacts/ganymede-windows-arm64.zip" -Force
+          Remove-Item "ganymede.exe" -Force
+
+      - name: Generate Checksums
+        shell: pwsh
+        run: |
+          Set-Location artifacts
+          $hashes = Get-FileHash -Algorithm SHA256 *.zip | ForEach-Object {
+            "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+          }
+          $hashes | Out-File -FilePath checksums.txt -Encoding utf8
+          Get-Content checksums.txt
+          Set-Location ..
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Ganymede ${{ steps.version.outputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            artifacts/ganymede-windows-amd64.zip
+            artifacts/ganymede-windows-arm64.zip
+            artifacts/checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-winget:
+    name: Publish to WinGet
+    needs: release
+    runs-on: windows-latest
+    steps:
+      - name: Check WINGET_TOKEN availability
+        id: check_token
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace("${{ secrets.WINGET_TOKEN }}")) {
+            Write-Host "::warning::WINGET_TOKEN secret is not set. Skipping automated submission to microsoft/winget-pkgs."
+            Write-Host "To enable auto-publishing to WinGet on every release:"
+            Write-Host "1. Create a GitHub Personal Access Token (Classic) with 'public_repo' scope."
+            Write-Host "2. Save it in Repository Settings -> Secrets and variables -> Actions as WINGET_TOKEN."
+            echo "has_token=false" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "has_token=true" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Run WinGet Releaser
+        if: steps.check_token.outputs.has_token == 'true'
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: subhankarcoder.ganymede
+          token: ${{ secrets.WINGET_TOKEN }}

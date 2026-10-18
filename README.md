@@ -19,12 +19,25 @@ Ganymede CLI lets designers pick colors from anywhere on their active screen wit
 
 ---
 
-## 📦 Quick Start
+## 📦 Installation
 
-### 1. Build & Run
+### 1. Via Windows Package Manager (WinGet - Recommended)
+Install with a single command in any Windows terminal (PowerShell, Command Prompt, or Windows Terminal):
+
 ```powershell
-# Build executable (targeting Windows GUI subsystem enables completely silent background startup)
-go build -ldflags "-H=windowsgui" -o ganymede.exe .
+winget install subhankarcoder.ganymede
+```
+
+> **Note**: WinGet automatically exposes the `ganymede` command to your system `PATH`. You can run `ganymede` immediately from any terminal!
+
+### 2. Manual / Build from Source
+```powershell
+# Clone the repository
+git clone https://github.com/subhankarcoder/ganymede-cli.git
+cd ganymede-cli
+
+# Build executable (Windows GUI subsystem enables silent background execution)
+go build -trimpath -ldflags "-H=windowsgui -s -w" -o ganymede.exe .
 
 # Run the interactive setup wizard
 .\ganymede.exe init
@@ -63,6 +76,7 @@ During installation, Ganymede walks you through 3 simple questions:
 | `ganymede config hotkey` | Re-test system shortcuts and select a new hotkey |
 | `ganymede config startup <enable\|disable>` | Toggle automatic launch on Windows startup |
 | `ganymede config theme <name>` | Change palette theme (`ganymede`, `rainbow`, `cyberpunk`, `sunset`, `aurora`) |
+| `ganymede version` / `--version` | Display current release version |
 | `ganymede help` / `--help` | Display comprehensive manual and usage guide |
 
 ---
@@ -83,3 +97,29 @@ Example:
   "sound": true
 }
 ```
+
+---
+
+## 🚀 CI/CD & Automated WinGet Releases
+
+Ganymede CLI uses GitHub Actions for continuous integration, release packaging, and automatic publishing to Microsoft's official Windows Package Manager repository (`microsoft/winget-pkgs`).
+
+### How It Works:
+1. **Pushing Changes**: Every push to `main` and pull request automatically triggers `.github/workflows/ci.yml` which vets and cross-compiles Windows AMD64 and ARM64 binaries.
+2. **Releasing New Versions**: Pushing a version tag triggers `.github/workflows/release.yml`:
+   ```powershell
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+3. **Automated Pipeline**:
+   - Cross-compiles hardened Windows binaries (`amd64` and `arm64`) with `-trimpath` and GUI subsystem flags.
+   - Archives binaries with documentation into release zips.
+   - Computes SHA256 checksums.
+   - Creates a GitHub Release.
+   - Uses `vedantmgoyal9/winget-releaser` to submit a pull request directly to `microsoft/winget-pkgs`.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

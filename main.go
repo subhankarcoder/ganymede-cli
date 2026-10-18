@@ -64,10 +64,17 @@ func main() {
 	animateFlag := flag.Bool("animate", true, "Animate the banner reveal")
 	prismFlag := flag.Bool("prism", false, "Show the prism character illustration")
 	helpFlag := flag.Bool("help", false, "Display help instructions")
+	versionFlag := flag.Bool("version", false, "Display version information")
+	flag.BoolVar(versionFlag, "v", false, "Display version information (shorthand)")
 	silentFlag := flag.Bool("silent", false, "Silent execution mode for background startup")
 
 	flag.Parse()
 	args := flag.Args()
+
+	if *versionFlag {
+		fmt.Printf("Ganymede CLI v%s\n", strings.TrimPrefix(banner.Version, "v"))
+		return
+	}
 
 	cfg, err := config.Load()
 	if err != nil {
@@ -98,6 +105,10 @@ func main() {
 	subArgs := args[1:]
 
 	switch cmd {
+	case "version", "-v", "--version":
+		fmt.Printf("Ganymede CLI v%s\n", strings.TrimPrefix(banner.Version, "v"))
+		return
+
 	case "init", "install", "setup":
 		handleInit(cfg)
 

@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: subhankarcoder.ganymede
+PackageVersion: 0.1.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: ganymede.exe
+    PortableCommandAlias: ganymede
+Commands:
+  - ganymede
+ReleaseDate: 2026-10-18
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/subhankarcoder/ganymede-cli/releases/download/v0.1.0/ganymede-windows-amd64.zip
+    InstallerSha256: 2A05B66812598A02E6C8E4A365ACB4522CCC734F7361BA3C69317627328D887C
+  - Architecture: arm64
+    InstallerUrl: https://github.com/subhankarcoder/ganymede-cli/releases/download/v0.1.0/ganymede-windows-arm64.zip
+    InstallerSha256: 8A64EFACBE4160CA51ECB148662373E288459D773542EB325A828144BFB4FA92
+ManifestType: installer
+ManifestVersion: 1.6.0
