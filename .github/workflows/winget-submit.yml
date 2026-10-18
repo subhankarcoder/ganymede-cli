@@ -7,6 +7,10 @@ on:
         description: 'Package version to submit (e.g. 0.1.0)'
         required: true
         default: '0.1.0'
+      token:
+        description: 'GitHub Classic PAT (ghp_...) with public_repo (optional if WINGET_TOKEN secret is set)'
+        required: false
+        default: ''
 
 jobs:
   submit:
@@ -21,17 +25,27 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://aka.ms/wingetcreate/latest" -OutFile "wingetcreate.exe"
-          .\wingetcreate.exe --version
+          .\wingetcreate.exe version
 
       - name: Submit to microsoft/winget-pkgs
         shell: pwsh
         env:
           WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:WINGET_TOKEN)) {
-            Write-Error "WINGET_TOKEN secret is not set in repository secrets! Please add a Classic Personal Access Token with 'public_repo' scope."
+          $inputToken = "${{ github.event.inputs.token }}"
+          $token = if (-not [string]::IsNullOrWhiteSpace($inputToken)) { $inputToken } else { $env:WINGET_TOKEN }
+
+          if ([string]::IsNullOrWhiteSpace($token)) {
+            Write-Error "No GitHub token found! Please either enter your Classic PAT when running the workflow or save WINGET_TOKEN in Repository Settings -> Secrets and variables -> Actions."
           }
+
+          if ($token.StartsWith("github_pat_")) {
+            Write-Warning "Detected fine-grained token ('github_pat_...'). Note that fine-grained tokens cannot create forks of 'microsoft/winget-pkgs'. If this step fails with an authorization error, use a Classic PAT ('ghp_...') with 'public_repo' scope."
+          }
+
           $ver = "${{ github.event.inputs.version }}"
           $manifestPath = "manifests/s/subhankarcoder/ganymede/$ver"
           Write-Host "Submitting manifests from: $manifestPath"
-          .\wingetcreate.exe submit "$manifestPath" --token "$env:WINGET_TOKEN"
+
+          $env:WINGET_CREATE_GITHUB_TOKEN = $token
+          .\wingetcreate.exe submit "$manifestPath" --token "$token" --prtitle "New package: subhankarcoder.ganymede version $ver"
