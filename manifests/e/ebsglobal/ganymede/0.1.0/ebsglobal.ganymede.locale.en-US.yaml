@@ -1,16 +1,16 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
 
-PackageIdentifier: subhankarcoder.ganymede
+PackageIdentifier: ebsglobal.ganymede
 PackageVersion: 0.1.0
 PackageLocale: en-US
-Publisher: subhankarcoder
+Publisher: EBS Global
 PublisherUrl: https://github.com/subhankarcoder
 PublisherSupportUrl: https://github.com/subhankarcoder/ganymede-cli/issues
 PackageName: Ganymede
 PackageUrl: https://github.com/subhankarcoder/ganymede-cli
 License: MIT
 LicenseUrl: https://github.com/subhankarcoder/ganymede-cli/blob/main/LICENSE
-Copyright: Copyright (c) 2026 subhankarcoder
+Copyright: Copyright (c) 2026 EBS Global
 ShortDescription: Precision Screen Eyedropper & Palette Engine for Designers and Developers
 Description: |-
   Ganymede CLI lets designers and developers pick colors from anywhere on their active screen

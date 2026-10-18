@@ -10,9 +10,9 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-Write-Host ('✦ Validating WinGet Manifests for subhankarcoder.ganymede v' + $Version + '...') -ForegroundColor Cyan
+Write-Host ('✦ Validating WinGet Manifests for ebsglobal.ganymede v' + $Version + '...') -ForegroundColor Cyan
 
-$manifestDir = "manifests/s/subhankarcoder/ganymede/$Version"
+$manifestDir = "manifests/e/ebsglobal/ganymede/$Version"
 if (-not (Test-Path $manifestDir)) {
     Write-Error "Manifest directory not found: $manifestDir"
 }
@@ -41,11 +41,11 @@ Write-Host ''
 Write-Host 'Option 2 [Using official WingetCreate CLI]:' -ForegroundColor White
 Write-Host '  Run the following commands in PowerShell:'
 Write-Host '  Invoke-WebRequest -Uri https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe'
-Write-Host ('  .\wingetcreate.exe submit manifests\s\subhankarcoder\ganymede\' + $Version + ' --token YOUR_GITHUB_PAT')
+Write-Host ('  .\wingetcreate.exe submit manifests\e\ebsglobal\ganymede\' + $Version + ' --token YOUR_GITHUB_PAT')
 Write-Host ''
 Write-Host 'Option 3 [Manual Pull Request via GitHub web/fork]:' -ForegroundColor White
 Write-Host '  1. Fork https://github.com/microsoft/winget-pkgs'
-Write-Host ('  2. Copy the folder: manifests/s/subhankarcoder/ganymede/' + $Version)
+Write-Host ('  2. Copy the folder: manifests/e/ebsglobal/ganymede/' + $Version)
 Write-Host '     into the exact same path in your fork.'
-Write-Host ('  3. Create a Pull Request with title: New package: subhankarcoder.ganymede version ' + $Version)
+Write-Host ('  3. Create a Pull Request with title: New package: ebsglobal.ganymede version ' + $Version)
 Write-Host '================================================================================' -ForegroundColor Gray

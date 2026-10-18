@@ -25,7 +25,6 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://aka.ms/wingetcreate/latest" -OutFile "wingetcreate.exe"
-          .\wingetcreate.exe version
 
       - name: Submit to microsoft/winget-pkgs
         shell: pwsh
@@ -44,8 +43,8 @@ jobs:
           }
 
           $ver = "${{ github.event.inputs.version }}"
-          $manifestPath = "manifests/s/subhankarcoder/ganymede/$ver"
+          $manifestPath = "manifests/e/ebsglobal/ganymede/$ver"
           Write-Host "Submitting manifests from: $manifestPath"
 
           $env:WINGET_CREATE_GITHUB_TOKEN = $token
-          .\wingetcreate.exe submit "$manifestPath" --token "$token" --prtitle "New package: subhankarcoder.ganymede version $ver"
+          .\wingetcreate.exe submit "$manifestPath" --token "$token" --prtitle "New package: ebsglobal.ganymede version $ver"

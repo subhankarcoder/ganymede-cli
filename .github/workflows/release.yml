@@ -128,5 +128,5 @@ jobs:
         if: steps.check_token.outputs.has_token == 'true'
         uses: vedantmgoyal9/winget-releaser@v2
         with:
-          identifier: subhankarcoder.ganymede
+          identifier: ebsglobal.ganymede
           token: ${{ secrets.WINGET_TOKEN }}

@@ -25,7 +25,11 @@ Ganymede CLI lets designers pick colors from anywhere on their active screen wit
 Install with a single command in any Windows terminal (PowerShell, Command Prompt, or Windows Terminal):
 
 ```powershell
-winget install subhankarcoder.ganymede
+# Install directly by short name
+winget install ganymede
+
+# Or via full package identifier
+winget install ebsglobal.ganymede
 ```
 
 > **Note**: WinGet automatically exposes the `ganymede` command to your system `PATH`. You can run `ganymede` immediately from any terminal!
